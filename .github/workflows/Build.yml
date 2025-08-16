@@ -3,7 +3,7 @@ on: [push, pull_request, workflow_dispatch]
 
 jobs:
   Build:
-    name: "Build : ${{ matrix.os }}-${{ matrix.compiler }}"
+    name: "Build : ${{ matrix.os }}"
     if: "!contains(github.event.head_commit.message, '[skip CI]')"
     runs-on: ${{ matrix.os }}
     permissions:
@@ -17,7 +17,7 @@ jobs:
         compiler: [llvm]
 
     env:
-      BUILD_DIR: build/${{ matrix.os }}-${{ matrix.compiler }}
+      BUILD_DIR: build/${{ matrix.os }}
       APP_EXT: ${{ contains(matrix.os, 'windows' ) && '.exe' || '' }}
 
     steps:
@@ -26,7 +26,7 @@ jobs:
       - name: Setup Cpp
         uses: aminya/setup-cpp@v1.6.0
         with:
-          compiler: ${{ matrix.compiler }}
+          compiler: llvm
           cmake: true
           ninja: true
           vcpkg: false
@@ -42,7 +42,7 @@ jobs:
       - name: Upload Executable
         uses: actions/upload-artifact@v4
         with:
-          name: file2cpp-${{ contains(matrix.os, 'windows' ) && 'windows' || 'ubuntu' }}
+          name: file2cpp-${{ matrix.os }}
           path: ${{ env.BUILD_DIR }}/file2cpp${{ env.APP_EXT }}
           retention-days: 1
           overwrite: true
