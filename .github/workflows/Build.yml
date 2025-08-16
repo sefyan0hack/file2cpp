@@ -42,7 +42,7 @@ jobs:
       - name: Upload Executable
         uses: actions/upload-artifact@v4
         with:
-          name: file2cpp-${{ matrix.os }}-${{ matrix.compiler }}
+          name: file2cpp-${{ contains(matrix.os, 'windows' ) && 'windows' || 'ubuntu' }}
           path: ${{ env.BUILD_DIR }}/file2cpp${{ env.APP_EXT }}
           retention-days: 1
           overwrite: true
