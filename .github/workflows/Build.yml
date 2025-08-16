@@ -38,11 +38,3 @@ jobs:
       - name: Build
         shell: bash
         run: cmake --build "${{ env.BUILD_DIR }}"
-
-      - name: Upload Executable
-        uses: actions/upload-artifact@v4
-        with:
-          name: file2cpp-${{ matrix.os }}
-          path: ${{ env.BUILD_DIR }}/file2cpp${{ env.APP_EXT }}
-          retention-days: 1
-          overwrite: true

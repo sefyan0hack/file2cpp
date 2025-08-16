@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    name: "Build : ${{ matrix.os }}"
+    runs-on: ${{ matrix.os }}
+    permissions:
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, windows-11-arm, ubuntu-latest, ubuntu-22.04-arm]
+        compiler: [llvm]
+
+    env:
+      BUILD_DIR: build/${{ matrix.os }}
+      APP_EXT: ${{ contains(matrix.os, 'windows' ) && '.exe' || '' }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Cpp
+        uses: aminya/setup-cpp@v1.6.0
+        with:
+          compiler: llvm
+          cmake: true
+          ninja: true
+          vcpkg: false
+
+      - name: Configure CMake
+        shell: bash
+        run: cmake -S . -B "$BUILD_DIR" -G "Ninja" -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        shell: bash
+        run: cmake --build "${{ env.BUILD_DIR }}"
+
+      - name: Rename Artifact
+        shell: bash
+        run: |
+          new_name="file2cpp-${{ matrix.os }}${{ env.APP_EXT }}"
+          cp "${{ env.BUILD_DIR }}/file2cpp${{ env.APP_EXT }}" "${{ github.workspace }}/$new_name"
+          echo "ARTIFACT_PATH=${{ github.workspace }}/$new_name" >> $GITHUB_ENV
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: file2cpp-${{ matrix.os }}
+          path: ${{ env.ARTIFACT_PATH }}
+          retention-days: 1
+
+  create-release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: file2cpp-*
+          merge-multiple: true
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref }}
+          name: Release ${{ github.ref_name }}
+          body: "Precompiled binaries for all supported platforms"
+          files: |
+            artifacts/file2cpp-*
