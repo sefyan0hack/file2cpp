@@ -1,8 +1,0 @@
-[
-{
-  "directory": "C:/Users/sefyan/Documents/c_projects/file2cpp/build",
-  "command": "C:\\mingw64\\bin\\g++.exe -DNOMINMAX -DWIN32_LEAN_AND_MEAN -D_CRT_SECURE_NO_WARNINGS  -g -std=c++23 -o CMakeFiles\\file2cpp.dir\\main.cpp.obj -c C:\\Users\\sefyan\\Documents\\c_projects\\file2cpp\\main.cpp",
-  "file": "C:/Users/sefyan/Documents/c_projects/file2cpp/main.cpp",
-  "output": "CMakeFiles/file2cpp.dir/main.cpp.obj"
-}
-]
