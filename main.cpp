@@ -43,12 +43,12 @@ int main(int argc, char* argv[]){
     {
         auto filename = e.path().generic_string();
         Pack_CPP_File << file2code(filename) << endl;
-        Pack_Header_File << format("extern unsigned char res_{}[];", hash<string>{}(filename)) << endl;
+        Pack_Header_File << format("extern const unsigned char res_{}[];", hash<string>{}(filename)) << endl;
     }
 
     // -----
 
-    Pack_Header_File << "std::unordered_map<std::string, std::pair<const unsigned char*, size_t>> Resources {" << endl;
+    Pack_Header_File << "inline std::unordered_map<std::string, std::pair<const unsigned char*, size_t>> embedFile {" << endl;
 
     for (auto e : fs::recursive_directory_iterator(res_dir)
     | views::filter([](const auto& e) { return e.is_regular_file(); }))
@@ -91,7 +91,7 @@ auto file2code(string filename) -> string
     auto buff = stringstream{};
     auto content = file2str(filename);
 
-    buff << format("constexpr static unsigned char res_{}[] {{", hash<string>{}(filename));
+    buff << format("extern const unsigned char res_{}[] {{", hash<string>{}(filename));
     
     for (const auto& b : content) buff << byte2hex(b) << ',';
 
